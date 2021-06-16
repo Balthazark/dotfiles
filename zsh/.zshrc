@@ -11,6 +11,7 @@ stty stop undef		# Disable ctrl-s to freeze terminal.
 export LC_CTYPE="sv_SE.UTF-8"
 export EDITOR='vim'
 
+alias neofetch="neofetch --kitty --source /home/karl/pictures/lake.png"
 alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 

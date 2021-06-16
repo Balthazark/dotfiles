@@ -18,7 +18,7 @@ exec_always --no-startup-id xinput --set-prop 13 367 1
 exec_always picom --experimental-backends
 
 #feh start up
-exec_always feh --bg-scale /home/karl/pictures/japanhus.png
+exec_always feh --bg-scale /home/karl/pictures/lake.png
 
 #Activate gaps
 for_window [class="^.*"] border pixel 0
