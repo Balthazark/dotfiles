@@ -3,6 +3,8 @@
 # Should you change your keyboard layout some time, delete
 # this file and re-run i3-config-wizard(1).
 
+#enable tapping at boot
+exec_always xinput set-prop <device id> <property id> 1
 
 #start up polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
