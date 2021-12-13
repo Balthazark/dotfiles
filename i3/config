@@ -4,11 +4,13 @@
 # this file and re-run i3-config-wizard(1).
 
 #enable tapping at boot
-exec_always xinput set-prop 13 369 1
+exec_always xinput set-prop 13 370 1
 
 #start up polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
 
+#Start tlp
+exec_always sudo tlp start
 
 #Enable natural scrolling
 exec_always --no-startup-id xinput --set-prop 13 "libinput Natural Scrolling Enabled" 1
@@ -29,6 +31,8 @@ gaps outer 4
 gaps top 45
 gaps bottom 4
 
+#Start new tiling
+exec_always --no-startup-id autotiling
 
 #start tiling script
 exec_always --no-startup-id ~/.cargo/bin/i3-auto-layout
