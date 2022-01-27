@@ -4,7 +4,7 @@
 # this file and re-run i3-config-wizard(1).
 
 #enable tapping at boot
-exec_always xinput set-prop 13 370 1
+exec_always xinput set-prop 13 371 1
 
 #start up polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
