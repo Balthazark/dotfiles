@@ -95,7 +95,7 @@ module-margin = 1
 ;   font-3 = FontAwesome:size=10
 ; See the Fonts wiki page for more details
 font-0 = Roboto mono:size=20;3
-font-1 = FontAwesome5Free:style=Solid:size=20;3
+font-1 = FontAwesome6Free:style=Solid:size=20;3
 
 ; Modules are added to one of the available blocks
 ;   modules-left = cpu ram
