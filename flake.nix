@@ -15,18 +15,29 @@
     };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, ... }: {
-    darwinConfigurations."navi" = nix-darwin.lib.darwinSystem {
-      system = "aarch64-darwin";
-      modules = [
-        ./darwin/default.nix
-        home-manager.darwinModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.kagu = import ./home/default.nix;
-        }
-      ];
+  outputs =
+    {
+      nixpkgs,
+      nix-darwin,
+      home-manager,
+      ...
+    }:
+    {
+      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
+
+      darwinConfigurations."navi" = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+        modules = [
+          ./darwin/default.nix
+          home-manager.darwinModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.kagu = import ./home/default.nix;
+            };
+          }
+        ];
+      };
     };
-  };
 }
