@@ -4,6 +4,8 @@ _: {
     ./git.nix
     ./ssh.nix
     ./zsh.nix
+    ./bat.nix
+    ./starship.nix
   ];
 
   home = {
