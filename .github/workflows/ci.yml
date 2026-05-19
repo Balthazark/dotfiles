@@ -15,7 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@v22
-      - uses: DeterminateSystems/flake-checker-action@v12
 
       - name: Check formatting
         run: nix run nixpkgs#nixfmt-tree -- --fail-on-change
@@ -32,7 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@v22
-      - uses: DeterminateSystems/magic-nix-cache-action@v13
 
       - name: Build navi
         run: nix build .#darwinConfigurations.navi.system
