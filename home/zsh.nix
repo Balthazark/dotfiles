@@ -22,6 +22,9 @@
       shellAliases = {
         drb = "sudo darwin-rebuild switch --flake ~/git/dotfiles#navi";
         ls = "eza --icons=always";
+        ll = "eza --icons=always -l";
+        la = "eza --icons=always -la";
+        cat = "bat";
         vim = "nvim";
         c = "clear";
         nf = "nvim $(fzf -m --preview='bat --color=always {}')";
