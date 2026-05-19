@@ -6,5 +6,6 @@
     pkgs.statix
     pkgs.deadnix
     pkgs.nixd
+    pkgs.neovim
   ];
 }

@@ -5,6 +5,7 @@ _: {
       user.name = "Karl Gunnarsson";
       user.email = "karlgunnarsson98@gmail.com";
       init.defaultBranch = "main";
+      core.editor = "nvim";
     };
   };
 }
