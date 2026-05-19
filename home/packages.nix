@@ -5,5 +5,6 @@
     pkgs.gh
     pkgs.statix
     pkgs.deadnix
+    pkgs.nixd
   ];
 }
