@@ -16,7 +16,7 @@ deadnix ~/git/dotfiles       # find unused bindings
 sudo darwin-rebuild check --flake ~/git/dotfiles#navi  # dry-run without applying
 ```
 
-Always run `nix fmt` and `statix check` after editing any `.nix` file. Run `drb` to verify the config builds and activates before considering a task done.
+Always run `nix fmt`, `statix check`, and `deadnix` after editing any `.nix` file (the PostToolUse hook does this automatically). Run `drb` to verify the config builds and activates before considering a task done.
 
 ## Module structure
 
@@ -32,8 +32,10 @@ home/
   default.nix          # imports the home modules below
   packages.nix         # home.packages — user CLI tools
   git.nix              # programs.git
-  zsh.nix              # programs.zsh + shell aliases
+  zsh.nix              # programs.zsh, fzf, zoxide — shell config, vi mode, aliases
   ssh.nix              # programs.ssh — ~/.ssh/config with macOS Keychain integration
+  bat.nix              # programs.bat — catppuccin-mocha theme
+  starship.nix         # programs.starship — prompt with catppuccin-mocha palette
 ```
 
 darwin modules are nix-darwin modules; home modules are home-manager modules. The two systems are composed in `flake.nix` via `home-manager.darwinModules.home-manager`.
