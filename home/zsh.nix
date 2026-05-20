@@ -27,6 +27,9 @@
         cat = "bat";
         vim = "nvim";
         c = "clear";
+        ".." = "cd ..";
+        "..." = "cd ../..";
+        "...." = "cd ../../..";
         nf = "nvim $(fzf -m --preview='bat --color=always {}')";
         bf = "fzf -m --preview='bat --color=always {}'";
       };
