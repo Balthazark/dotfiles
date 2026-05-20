@@ -72,3 +72,13 @@ Conventional commits with scopes. Common scopes:
 ## Adding new things
 
 Before adding any new option or package, explain what it does and why. The goal is to understand everything in the config, not just accumulate settings.
+
+## Code intelligence
+
+Prefer LSP over Grep/Glob/Read for code navigation when a language server is available:
+- `goToDefinition` / `goToImplementation` to jump to source
+- `findReferences` to find all usages across the codebase
+- `hover` for type info without reading the file
+- `workspaceSymbol` to locate a symbol project-wide
+
+Use Grep/Glob for text/pattern searches (comments, strings, config values) where LSP doesn't apply. After editing, check LSP diagnostics and fix any errors before moving on.
