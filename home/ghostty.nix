@@ -11,6 +11,7 @@
       window-padding-x = 10;
       window-padding-y = 10;
       macos-titlebar-proxy-icon = "hidden";
+      progress-style = false;
       keybind = [
         "super+shift+h=goto_split:left"
         "super+shift+l=goto_split:right"
