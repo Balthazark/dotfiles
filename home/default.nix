@@ -5,6 +5,7 @@ _: {
     ./ssh.nix
     ./zsh.nix
     ./bat.nix
+    ./ghostty.nix
     ./starship.nix
   ];
 
