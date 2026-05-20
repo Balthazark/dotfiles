@@ -14,6 +14,9 @@
     pkg:
     builtins.elem (pkgs.lib.getName pkg) [
       "claude-code"
+      "slack"
+      "obsidian"
+      "google-chrome"
     ];
 
   system.stateVersion = 5;
