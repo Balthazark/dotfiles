@@ -63,6 +63,7 @@ Conventional commits with scopes. Common scopes:
 | `chore(system):` | `darwin/system.nix`, `darwin/security.nix` |
 | `chore(macos):` | `darwin/macos.nix` |
 | `chore(homebrew):` | `darwin/homebrew.nix` |
+| `feat(darwin):` / `fix(darwin):` | new darwin services (e.g. yabai, skhd) |
 | `feat(home):` / `fix(home):` | anything in `home/` |
 | `chore(flake):` | `flake.nix`, `flake.lock` |
 | `ci:` | `.github/workflows/` |
