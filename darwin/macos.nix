@@ -30,7 +30,7 @@ _: {
       NSAutomaticCapitalizationEnabled = false;
       NSAutomaticSpellingCorrectionEnabled = false;
       NSAutomaticPeriodSubstitutionEnabled = false; # double-space → period
-      "com.apple.swipescrolldirection" = false; # disable natural/reverse scrolling
+      "com.apple.swipescrolldirection" = true;
     };
 
     screencapture = {
