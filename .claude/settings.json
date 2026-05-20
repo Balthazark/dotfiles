@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | grep -q '\\.nix$' && (cd ~/git/dotfiles && nix fmt && statix check ~/git/dotfiles && deadnix ~/git/dotfiles) 2>/dev/null || true",
+            "command": "grep -q '\"file_path\":\"/.*\\.nix\"' && (cd ~/git/dotfiles && nix fmt && statix check ~/git/dotfiles && deadnix ~/git/dotfiles) 2>/dev/null || true",
             "statusMessage": "Formatting and linting nix files..."
           }
         ]
