@@ -5,5 +5,7 @@ _: {
     ./apps.nix
     ./homebrew.nix
     ./macos.nix
+    ./yabai.nix
+    ./skhd.nix
   ];
 }
