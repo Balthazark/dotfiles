@@ -46,6 +46,18 @@ _: {
       shift + alt - s : yabai -m window --display west; yabai -m display --focus west;
       shift + alt - g : yabai -m window --display east; yabai -m display --focus east;
 
+      # cycle spaces
+      ctrl - space : yabai -m space --focus next
+
+      # switch to space
+      ctrl - 1 : yabai -m space --focus 1
+      ctrl - 2 : yabai -m space --focus 2
+      ctrl - 3 : yabai -m space --focus 3
+      ctrl - 4 : yabai -m space --focus 4
+      ctrl - 5 : yabai -m space --focus 5
+      ctrl - 6 : yabai -m space --focus 6
+      ctrl - 7 : yabai -m space --focus 7
+
       # move window to space
       ctrl + alt - 1 : yabai -m window --space 1;
       ctrl + alt - 2 : yabai -m window --space 2;

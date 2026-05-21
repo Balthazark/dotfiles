@@ -1,7 +1,7 @@
 _: {
   system.keyboard = {
     enableKeyMapping = true;
-    remapCapsLockToEscape = true;
+    remapCapsLockToControl = true;
   };
 
   system.defaults = {
