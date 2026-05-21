@@ -1,5 +1,6 @@
 _: {
   launchd.agents.ssh-add = {
+    enable = true;
     config = {
       ProgramArguments = [
         "/usr/bin/ssh-add"
