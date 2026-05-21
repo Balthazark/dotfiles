@@ -37,10 +37,10 @@ _: {
       shift + alt - l : yabai -m window --swap east
 
       # move window and split
-      ctrl + alt - h : yabai -m window --warp west
-      ctrl + alt - j : yabai -m window --warp south
-      ctrl + alt - k : yabai -m window --warp north
-      ctrl + alt - l : yabai -m window --warp east
+      cmd + ctrl - h : yabai -m window --warp west
+      cmd + ctrl - j : yabai -m window --warp south
+      cmd + ctrl - k : yabai -m window --warp north
+      cmd + ctrl - l : yabai -m window --warp east
 
       # move window to display left and right
       shift + alt - s : yabai -m window --display west; yabai -m display --focus west;
@@ -56,18 +56,18 @@ _: {
       ctrl - 7 : yabai -m space --focus 7
 
       # move window to space
-      ctrl + alt - 1 : yabai -m window --space 1;
-      ctrl + alt - 2 : yabai -m window --space 2;
-      ctrl + alt - 3 : yabai -m window --space 3;
-      ctrl + alt - 4 : yabai -m window --space 4;
-      ctrl + alt - 5 : yabai -m window --space 5;
-      ctrl + alt - 6 : yabai -m window --space 6;
-      ctrl + alt - 7 : yabai -m window --space 7;
+      cmd + ctrl - 1 : yabai -m window --space 1;
+      cmd + ctrl - 2 : yabai -m window --space 2;
+      cmd + ctrl - 3 : yabai -m window --space 3;
+      cmd + ctrl - 4 : yabai -m window --space 4;
+      cmd + ctrl - 5 : yabai -m window --space 5;
+      cmd + ctrl - 6 : yabai -m window --space 6;
+      cmd + ctrl - 7 : yabai -m window --space 7;
 
       # stop/start/restart yabai
-      ctrl + alt - q : yabai --stop-service
-      ctrl + alt - s : yabai --start-service
-      ctrl + alt - r : yabai --restart-service
+      cmd + ctrl - q : yabai --stop-service
+      cmd + ctrl - s : yabai --start-service
+      cmd + ctrl - r : yabai --restart-service
     '';
   };
 }

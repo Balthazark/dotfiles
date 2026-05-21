@@ -5,7 +5,7 @@ _: {
     config = {
       layout = "bsp";
       window_placement = "second_child";
-      top_padding = 17;
+      top_padding = 12;
       bottom_padding = 12;
       left_padding = 12;
       right_padding = 12;
@@ -18,6 +18,9 @@ _: {
       window_shadow = "off";
     };
     extraConfig = ''
+      sudo yabai --load-sa
+      yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
       yabai -m rule --add app="^System Settings$" manage=off
       yabai -m rule --add app="^Calculator$" manage=off
       yabai -m rule --add app="^Finder$" manage=off
