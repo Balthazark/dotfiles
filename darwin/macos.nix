@@ -4,6 +4,20 @@ _: {
     remapCapsLockToControl = true;
   };
 
+  # remapCapsLockToControl alone resets per-keyboard on reboot; hidutil re-applies it at every login
+  launchd.user.agents.hidutil-caps-to-ctrl = {
+    serviceConfig = {
+      ProgramArguments = [
+        "/usr/bin/hidutil"
+        "property"
+        "--set"
+        ''{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":30064771129,"HIDKeyboardModifierMappingDst":30064771296}]}''
+      ];
+      RunAtLoad = true;
+      KeepAlive = false;
+    };
+  };
+
   system.defaults = {
     dock = {
       autohide = true;
