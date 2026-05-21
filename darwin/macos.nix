@@ -53,7 +53,7 @@ _: {
     };
 
     screencapture = {
-      location = "~/Desktop";
+      location = "~/Pictures/Screenshots";
       type = "png";
     };
 
