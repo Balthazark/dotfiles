@@ -28,6 +28,15 @@ _: {
       orientation = "bottom";
       minimize-to-application = true; # minimize into app icon, not separate tile
       mru-spaces = false;
+      persistent-others = [ ];
+      persistent-apps = [
+        "/Applications/Nix Apps/Ghostty.app"
+        "/Applications/Nix Apps/Google Chrome.app"
+        "/Applications/Nix Apps/Obsidian.app"
+        "/Applications/Nix Apps/Slack.app"
+        "/Applications/Microsoft Teams.app"
+        "/Applications/Microsoft Outlook.app"
+      ];
     };
 
     finder = {
