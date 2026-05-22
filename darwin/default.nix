@@ -7,5 +7,6 @@ _: {
     ./macos.nix
     ./yabai.nix
     ./skhd.nix
+    ./jankyborders.nix
   ];
 }
