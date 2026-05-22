@@ -25,6 +25,14 @@ _: {
       yabai -m rule --add app="^Calculator$" manage=off
       yabai -m rule --add app="^Finder$" manage=off
 
+      yabai -m rule --add app="^Ghostty$" space=1
+      yabai -m rule --add app="^Google Chrome$" space=2
+      yabai -m rule --add app="^Obsidian$" space=3
+      yabai -m rule --add app="^Slack$" space=4
+      yabai -m rule --add app="^Microsoft Teams$" space=5
+      yabai -m rule --add app="^Microsoft Outlook$" space=6
+      yabai -m rule --add app="^rekordbox 7$" space=7
+
       yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
       yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
     '';

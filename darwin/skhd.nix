@@ -12,23 +12,11 @@ _: {
       alt - s : yabai -m display --focus west
       alt - g : yabai -m display --focus east
 
-      # rotate layout clockwise
-      shift + alt - r : yabai -m space --rotate 270
-
-      # flip along y-axis
-      shift + alt - y : yabai -m space --mirror y-axis
-
-      # flip along x-axis
-      shift + alt - x : yabai -m space --mirror x-axis
-
       # toggle window float
       shift + alt - t : yabai -m window --toggle float --grid 4:4:1:1:2:2
 
       # maximize a window
       shift + alt - m : yabai -m window --toggle zoom-fullscreen
-
-      # balance out tree of windows
-      shift + alt - e : yabai -m space --balance
 
       # swap windows
       shift + alt - h : yabai -m window --swap west
@@ -64,9 +52,7 @@ _: {
       cmd + ctrl - 6 : yabai -m window --space 6;
       cmd + ctrl - 7 : yabai -m window --space 7;
 
-      # stop/start/restart yabai
-      cmd + ctrl - q : yabai --stop-service
-      cmd + ctrl - s : yabai --start-service
+      # restart yabai
       cmd + ctrl - r : yabai --restart-service
     '';
   };
