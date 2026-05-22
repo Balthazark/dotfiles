@@ -41,7 +41,6 @@ _: {
       ctrl - 4 : yabai -m space --focus 4
       ctrl - 5 : yabai -m space --focus 5
       ctrl - 6 : yabai -m space --focus 6
-      ctrl - 7 : yabai -m space --focus 7
 
       # move window to space
       cmd + ctrl - 1 : yabai -m window --space 1;
@@ -50,7 +49,6 @@ _: {
       cmd + ctrl - 4 : yabai -m window --space 4;
       cmd + ctrl - 5 : yabai -m window --space 5;
       cmd + ctrl - 6 : yabai -m window --space 6;
-      cmd + ctrl - 7 : yabai -m window --space 7;
 
       # restart yabai
       cmd + ctrl - r : yabai --restart-service
