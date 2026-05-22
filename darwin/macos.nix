@@ -71,6 +71,8 @@ _: {
       GuestEnabled = false;
     };
 
+    universalaccess.reduceMotion = true;
+
     CustomUserPreferences = {
       NSGlobalDomain = {
         AppleAccentColor = 4;
