@@ -76,7 +76,9 @@ _: {
       NSGlobalDomain = {
         AppleAccentColor = 4;
         _HIInterfaceStyle = "TintedDark";
-        AppleSpacesSwitchOnActivate = false;
+      };
+      "com.apple.dock" = {
+        "workspaces-auto-swoosh" = false;
       };
     };
   };
