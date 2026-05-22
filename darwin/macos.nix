@@ -27,6 +27,7 @@ _: {
       tilesize = 48;
       orientation = "bottom";
       minimize-to-application = true; # minimize into app icon, not separate tile
+      mru-spaces = false;
     };
 
     finder = {
