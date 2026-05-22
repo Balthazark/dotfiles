@@ -60,5 +60,12 @@ _: {
     loginwindow = {
       GuestEnabled = false;
     };
+
+    CustomUserPreferences = {
+      NSGlobalDomain = {
+        AppleAccentColor = 4;
+        _HIInterfaceStyle = "TintedDark";
+      };
+    };
   };
 }
