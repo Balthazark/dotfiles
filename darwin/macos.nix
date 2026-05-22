@@ -35,7 +35,6 @@ _: {
         "/Applications/Nix Apps/Obsidian.app"
         "/Applications/Nix Apps/Slack.app"
         "/Applications/Microsoft Teams.app"
-        "/Applications/Microsoft Outlook.app"
       ];
     };
 
@@ -77,6 +76,7 @@ _: {
       NSGlobalDomain = {
         AppleAccentColor = 4;
         _HIInterfaceStyle = "TintedDark";
+        AppleSpacesSwitchOnActivate = false;
       };
     };
   };

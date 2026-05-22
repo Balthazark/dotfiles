@@ -9,7 +9,6 @@ _: {
     };
     casks = [
       "microsoft-teams"
-      "microsoft-outlook"
       "rekordbox"
       "figma"
     ];
