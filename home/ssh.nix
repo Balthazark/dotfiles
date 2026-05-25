@@ -13,14 +13,14 @@ _: {
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "*" = {
-        addKeysToAgent = "yes";
-        extraOptions.UseKeychain = "yes";
+        AddKeysToAgent = "yes";
+        UseKeychain = "yes";
       };
       "github.com" = {
-        user = "git";
-        identityFile = "~/.ssh/id_ed25519";
+        User = "git";
+        IdentityFile = "~/.ssh/id_ed25519";
       };
     };
   };
