@@ -32,6 +32,7 @@
         "...." = "cd ../../..";
         nf = "nvim $(fzf -m --preview='bat --color=always {}')";
         bf = "fzf -m --preview='bat --color=always {}'";
+        todo = "nvim ~/git/notes/TODO.md";
       };
 
       initContent = ''
@@ -50,6 +51,8 @@
         zstyle ':completion:*' menu no
         zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --icons=always --color=always $realpath'
         zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --icons=always --color=always $realpath'
+
+        ta() { echo "- [ ] $*" >> ~/git/notes/TODO.md }
       '';
     };
 
