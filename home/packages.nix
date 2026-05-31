@@ -9,5 +9,7 @@
     pkgs.nixd
     pkgs.neovim
     pkgs.vivid
+    (pkgs.php.withExtensions ({ enabled, all }: enabled ++ [ all.redis ]))
+    pkgs.php.packages.composer
   ];
 }
