@@ -17,6 +17,7 @@
       sessionVariables = {
         EDITOR = "nvim";
         VISUAL = "nvim";
+        _ZO_DOCTOR = "0";
       };
 
       shellAliases = {

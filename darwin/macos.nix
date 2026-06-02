@@ -30,10 +30,10 @@ _: {
       mru-spaces = false;
       persistent-others = [ ];
       persistent-apps = [
-        "/Applications/Nix Apps/Ghostty.app"
-        "/Applications/Nix Apps/Google Chrome.app"
-        "/Applications/Nix Apps/Obsidian.app"
-        "/Applications/Nix Apps/Slack.app"
+        "/Applications/Ghostty.app"
+        "/Applications/Google Chrome.app"
+        "/Applications/Obsidian.app"
+        "/Applications/Slack.app"
         "/Applications/Microsoft Teams.app"
       ];
     };

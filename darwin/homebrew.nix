@@ -8,9 +8,13 @@ _: {
       cleanup = "zap";
     };
     casks = [
-      "microsoft-teams"
-      "rekordbox"
+      "ghostty"
+      "google-chrome"
       "figma"
+      "microsoft-teams"
+      "obsidian"
+      "rekordbox"
+      "slack"
     ];
   };
 }

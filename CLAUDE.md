@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-nix-darwin + home-manager configuration for a single machine (`navi`, aarch64-darwin). One flake, nixpkgs-unstable. Homebrew is used only for GUI apps with no Nix equivalent.
+nix-darwin + home-manager configuration for a single machine (`navi`, aarch64-darwin). One flake, nixpkgs-unstable. Homebrew is used for all GUI apps (casks), regardless of whether a Nix package exists, to get faster upstream updates.
 
 ## Commands
 
@@ -26,8 +26,7 @@ darwin/
   default.nix          # imports the darwin modules below
   system.nix           # hostname, primaryUser, stateVersion, experimental-features, unfree allowlist
   security.nix         # Touch ID sudo
-  apps.nix             # GUI apps from nixpkgs — environment.systemPackages for Spotlight visibility
-  homebrew.nix         # GUI casks only (no Nix equivalent); cleanup = "zap" means unlisted casks are removed on rebuild
+  homebrew.nix         # all GUI casks; cleanup = "zap" means unlisted casks are removed on rebuild
   macos.nix            # system.defaults — dock, finder, trackpad, keyboard, screenshots
 home/
   default.nix          # imports the home modules below
@@ -43,7 +42,7 @@ darwin modules are nix-darwin modules; home modules are home-manager modules. Th
 
 ## Conventions
 
-**Adding packages:** CLI tools go in `home/packages.nix`. GUI apps with a Nix package go in `darwin/apps.nix` (`environment.systemPackages`) so nix-darwin links them into `/Applications/Nix Apps/` for Spotlight; their config goes in a `home/` module. GUI apps with no Nix equivalent go in `darwin/homebrew.nix`. Programs with configuration (git, zsh, ssh) get their own module in `home/`.
+**Adding packages:** CLI tools go in `home/packages.nix`. GUI apps go in `darwin/homebrew.nix` as casks. Programs with configuration (git, zsh, ssh) get their own module in `home/`.
 
 **New modules:** create the file, add it to the relevant `default.nix` imports list. Use `_:` for modules that don't destructure arguments; use `{ pkgs, ... }:` only when `pkgs` is needed.
 
