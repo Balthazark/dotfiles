@@ -2,8 +2,8 @@ name: Update flake inputs
 
 on:
   schedule:
-    - cron: '17 7 * * *'
-      timezone: 'Europe/Stockholm'
+    - cron: '17 6 * * *'
+  workflow_dispatch:
 
 jobs:
   update:
