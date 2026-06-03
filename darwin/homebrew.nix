@@ -4,8 +4,8 @@ _: {
     onActivation = {
       autoUpdate = true;
       upgrade = true;
-      # Uninstall any cask not listed here on rebuild — keeps config authoritative
       cleanup = "zap";
+      extraFlags = [ "--force" ];
     };
     casks = [
       "ghostty"
