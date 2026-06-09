@@ -222,6 +222,7 @@
         opacity: 0,
         fadeIn, hold, fadeOut,
         age: 0,
+        typeSpeed: rand(1.0, 2.0),
         flickerFrames: 0,
         flickerTotal: 0,
       };
@@ -267,11 +268,16 @@
         if (p.y < -30)              p.y = canvas.height + 30;
         if (p.y > canvas.height + 30) p.y = -30;
 
+        const typingProgress = Math.min(p.age / (p.fadeIn * p.typeSpeed), 1);
+        const displayLength  = Math.ceil(typingProgress * p.text.length);
+        const cursor         = displayLength < p.text.length ? '_' : '';
+        const displayText    = p.text.slice(0, displayLength) + cursor;
+
         ctx.save();
         ctx.globalAlpha = p.opacity;
         ctx.fillStyle   = p.color;
         ctx.font        = p.font;
-        ctx.fillText(p.text, p.x, p.y);
+        ctx.fillText(displayText, p.x, p.y);
         ctx.restore();
 
         p.age++;
