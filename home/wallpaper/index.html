@@ -222,6 +222,8 @@
         opacity: 0,
         fadeIn, hold, fadeOut,
         age: 0,
+        flickerFrames: 0,
+        flickerTotal: 0,
       };
     }
 
@@ -247,6 +249,15 @@
           p.opacity = p.maxOpacity;
         } else {
           p.opacity = ((total - p.age) / p.fadeOut) * p.maxOpacity;
+        }
+
+        if (p.flickerFrames > 0) {
+          const t = 1 - (p.flickerFrames / p.flickerTotal);
+          p.opacity *= 1 - (0.55 * Math.sin(t * Math.PI));
+          p.flickerFrames--;
+        } else if (p.age > p.fadeIn + p.hold * 0.65 && Math.random() < 0.004) {
+          p.flickerTotal  = Math.floor(rand(20, 45));
+          p.flickerFrames = p.flickerTotal;
         }
 
         p.x += p.vx + Math.sin(p.age * 0.02 + p.phase) * 0.1;
