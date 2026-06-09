@@ -16,5 +16,8 @@ _: {
       "rekordbox"
       "slack"
     ];
+    masApps = {
+      Plash = 1494023538;
+    };
   };
 }

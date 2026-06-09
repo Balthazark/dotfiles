@@ -8,6 +8,7 @@
     ./bat.nix
     ./ghostty.nix
     ./starship.nix
+    ./wallpaper.nix
   ];
 
   home = {
