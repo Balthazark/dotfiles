@@ -62,6 +62,13 @@
       z-index: 11;
     }
 
+    #ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
     .logo-container {
       position: fixed;
       top: 50%;
@@ -100,6 +107,8 @@
   </style>
 </head>
 <body>
+  <canvas id="ambient"></canvas>
+
   <div class="logo-container">
     <svg class="nix-logo" viewBox="0 0 501.70361 435.14028" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -133,5 +142,124 @@
       </g>
     </svg>
   </div>
+
+  <script>
+    const canvas = document.getElementById('ambient');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const NOISE     = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンλ';
+    const JAPANESE  = ['電脳','接続','記憶','存在','意識','現実','孤独','境界','信号','層','ネット','データ','エラー','システム','プロセス','メモリ','ホスト','カーネル'];
+    const NIX       = ['flake.nix','wallpaper.nix','home-manager','nix-darwin','darwin/system.nix','mkDerivation','nixpkgs','home/zsh.nix','stdenv','buildInputs','home/git.nix','{ pkgs','...}:','inherit','lib.mkOption'];
+    const LAIN      = ['LAYER:01','LAYER:02','LAYER:03','WIRED','PROTOCOL 7','PRESENT DAY','PRESENT TIME','CLOSE THE WORLD','TACHIBANA LABS','ACCELA','NAVI'];
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+    function pick(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function createParticle() {
+      const roll = Math.random();
+      let text, fontFamily, size, color, maxOpacity;
+
+      if (roll < 0.25) {
+        // noise — mixed single chars
+        text       = NOISE[Math.floor(Math.random() * NOISE.length)];
+        fontFamily = "'Hiragino Sans', 'Yu Gothic', sans-serif";
+        size       = Math.floor(rand(12, 20));
+        color      = '#cdd6f4';
+        maxOpacity = rand(0.06, 0.10);
+      } else if (roll < 0.55) {
+        // ambient — japanese words
+        text       = pick(JAPANESE);
+        fontFamily = "'Hiragino Sans', 'Yu Gothic', sans-serif";
+        size       = Math.floor(rand(12, 18));
+        color      = '#cdd6f4';
+        maxOpacity = rand(0.07, 0.12);
+      } else if (roll < 0.80) {
+        // data — nix fragments
+        text       = pick(NIX);
+        fontFamily = "'VT323', monospace";
+        size       = Math.floor(rand(13, 19));
+        color      = '#89b4fa';
+        maxOpacity = rand(0.07, 0.11);
+      } else {
+        // signal — lain strings (rare, slightly more visible)
+        text       = pick(LAIN);
+        fontFamily = "'Share Tech Mono', monospace";
+        size       = Math.floor(rand(11, 15));
+        color      = '#74c7ec';
+        maxOpacity = rand(0.10, 0.16);
+      }
+
+      const fadeIn  = Math.floor(rand(60, 120));
+      const hold    = Math.floor(rand(200, 500));
+      const fadeOut = Math.floor(rand(60, 120));
+
+      return {
+        text,
+        font: `${size}px ${fontFamily}`,
+        color,
+        x: rand(20, canvas.width  - 20),
+        y: rand(20, canvas.height - 20),
+        vx: rand(-0.12, 0.12),
+        vy: rand(-0.12, 0.12),
+        maxOpacity,
+        opacity: 0,
+        fadeIn, hold, fadeOut,
+        age: 0,
+      };
+    }
+
+    const POOL = 50;
+    const particles = Array.from({ length: POOL }, createParticle);
+    particles.forEach(p => { p.age = Math.floor(rand(0, p.fadeIn + p.hold)); });
+
+    function tick() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const total = p.fadeIn + p.hold + p.fadeOut;
+
+        if (p.age >= total) {
+          particles[i] = createParticle();
+          continue;
+        }
+
+        if (p.age < p.fadeIn) {
+          p.opacity = (p.age / p.fadeIn) * p.maxOpacity;
+        } else if (p.age < p.fadeIn + p.hold) {
+          p.opacity = p.maxOpacity;
+        } else {
+          p.opacity = ((total - p.age) / p.fadeOut) * p.maxOpacity;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -60)              p.x = canvas.width  + 60;
+        if (p.x > canvas.width  + 60) p.x = -60;
+        if (p.y < -30)              p.y = canvas.height + 30;
+        if (p.y > canvas.height + 30) p.y = -30;
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle   = p.color;
+        ctx.font        = p.font;
+        ctx.fillText(p.text, p.x, p.y);
+        ctx.restore();
+
+        p.age++;
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    tick();
+  </script>
 </body>
 </html>
