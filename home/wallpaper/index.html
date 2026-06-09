@@ -154,7 +154,7 @@
     window.addEventListener('resize', resize);
     resize();
 
-    const NOISE     = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンλ';
+    const NOISE     = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
     const JAPANESE  = ['電脳','接続','記憶','存在','意識','現実','孤独','境界','信号','層','ネット','データ','エラー','システム','プロセス','メモリ','ホスト','カーネル'];
     const NIX       = ['flake.nix','wallpaper.nix','home-manager','nix-darwin','darwin/system.nix','mkDerivation','nixpkgs','home/zsh.nix','stdenv','buildInputs','home/git.nix','{ pkgs','...}:','inherit','lib.mkOption'];
     const LAIN      = ['LAYER:01','LAYER:02','LAYER:03','WIRED','PROTOCOL 7','PRESENT DAY','PRESENT TIME','CLOSE THE WORLD','TACHIBANA LABS','ACCELA','NAVI'];
@@ -208,6 +208,7 @@
         y: rand(20, canvas.height - 20),
         vx: rand(-0.12, 0.12),
         vy: rand(-0.12, 0.12),
+        phase: rand(0, Math.PI * 2),
         maxOpacity,
         opacity: 0,
         fadeIn, hold, fadeOut,
@@ -239,8 +240,8 @@
           p.opacity = ((total - p.age) / p.fadeOut) * p.maxOpacity;
         }
 
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx + Math.sin(p.age * 0.02 + p.phase) * 0.1;
+        p.y += p.vy + Math.cos(p.age * 0.02 + p.phase) * 0.1;
         if (p.x < -60)              p.x = canvas.width  + 60;
         if (p.x > canvas.width  + 60) p.x = -60;
         if (p.y < -30)              p.y = canvas.height + 30;
