@@ -145,143 +145,160 @@
 
   <script>
     const canvas = document.getElementById('ambient');
-    const ctx = canvas.getContext('2d');
+    const ctx    = canvas.getContext('2d');
 
-    function resize() {
-      canvas.width = window.innerWidth;
+    const resize = () => {
+      canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
-    }
+    };
     window.addEventListener('resize', resize);
     resize();
 
-    const NOISE     = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-    const JAPANESE  = ['電脳','接続','記憶','存在','意識','現実','孤独','境界','信号','層','ネット','データ','エラー','システム','プロセス','メモリ','ホスト','カーネル'];
-    const NIX       = ['flake.nix','wallpaper.nix','home-manager','nix-darwin','darwin/system.nix','mkDerivation','nixpkgs','home/zsh.nix','stdenv','buildInputs','home/git.nix','{ pkgs','...}:','inherit','lib.mkOption'];
-    const LAIN      = ['LAYER:01','LAYER:02','LAYER:03','WIRED','PROTOCOL 7','PRESENT DAY','PRESENT TIME','CLOSE THE WORLD','TACHIBANA LABS','ACCELA','NAVI'];
+    // content pools
+    const NOISE    = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+    const JAPANESE = ['電脳','接続','記憶','存在','意識','現実','孤独','境界','信号','層','ネット','データ','エラー','システム','プロセス','メモリ','ホスト','カーネル'];
+    const NIX      = ['flake.nix','wallpaper.nix','home-manager','nix-darwin','darwin/system.nix','mkDerivation','nixpkgs','home/zsh.nix','stdenv','buildInputs','home/git.nix','{ pkgs','...}:','inherit','lib.mkOption'];
+    const LAIN     = ['LAYER:01','LAYER:02','LAYER:03','WIRED','PROTOCOL 7','PRESENT DAY','PRESENT TIME','CLOSE THE WORLD','TACHIBANA LABS','ACCELA','NAVI'];
 
-    function rand(a, b) { return a + Math.random() * (b - a); }
-    function pick(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
+    // depth layer config [background, mid, foreground]
+    const LAYERS = [
+      { speedMult: 0.4, opacMult: 0.6, sizeMult: 0.8 },
+      { speedMult: 1.0, opacMult: 1.0, sizeMult: 1.0 },
+      { speedMult: 1.7, opacMult: 1.3, sizeMult: 1.2 },
+    ];
 
-    function createParticle() {
-      const lr         = Math.random();
-      const layer      = lr < 0.4 ? 0 : lr < 0.8 ? 1 : 2;
-      const speedMult  = [0.4, 1.0, 1.7][layer];
-      const opacMult   = [0.6, 1.0, 1.3][layer];
-      const sizeMult   = [0.8, 1.0, 1.2][layer];
+    // tuning
+    const POOL          = 50;
+    const MAX_OPACITY   = 0.22;
+    const WAVE_FREQ     = 0.02;
+    const WAVE_AMP      = 0.1;
+    const FLICKER_PROB  = 0.004;
+    const FLICKER_START = 0.65;
+    const FLICKER_DEPTH = 0.55;
+    const WRAP_X        = 60;
+    const WRAP_Y        = 30;
 
-      const roll = Math.random();
-      let text, fontFamily, size, color, maxOpacity;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const pick = arr  => arr[Math.floor(Math.random() * arr.length)];
 
-      if (roll < 0.25) {
-        // noise
-        text       = NOISE[Math.floor(Math.random() * NOISE.length)];
-        fontFamily = "'Hiragino Sans', 'Yu Gothic', sans-serif";
-        size       = Math.floor(rand(12, 20));
-        color      = '#cdd6f4';
-        maxOpacity = rand(0.06, 0.10);
-      } else if (roll < 0.55) {
-        // ambient — japanese words
-        text       = pick(JAPANESE);
-        fontFamily = "'Hiragino Sans', 'Yu Gothic', sans-serif";
-        size       = Math.floor(rand(12, 18));
-        color      = '#cdd6f4';
-        maxOpacity = rand(0.07, 0.12);
-      } else if (roll < 0.80) {
-        // data — nix fragments
-        text       = pick(NIX);
-        fontFamily = "'VT323', monospace";
-        size       = Math.floor(rand(13, 19));
-        color      = '#89b4fa';
-        maxOpacity = rand(0.07, 0.11);
-      } else {
-        // signal — lain strings
-        text       = pick(LAIN);
-        fontFamily = "'Share Tech Mono', monospace";
-        size       = Math.floor(rand(11, 15));
-        color      = '#74c7ec';
-        maxOpacity = rand(0.10, 0.16);
-      }
-
-      size       = Math.round(size * sizeMult);
-      maxOpacity = Math.min(maxOpacity * opacMult, 0.22);
-
-      const fadeIn  = Math.floor(rand(60, 120));
-      const hold    = Math.floor(rand(200, 500));
-      const fadeOut = Math.floor(rand(60, 120));
-
+    function contentConfig(roll) {
+      if (roll < 0.25) return {
+        text: NOISE[Math.floor(Math.random() * NOISE.length)],
+        fontFamily: "'Hiragino Sans', 'Yu Gothic', sans-serif",
+        size: Math.floor(rand(12, 20)),
+        color: '#cdd6f4',
+        maxOpacity: rand(0.06, 0.10),
+      };
+      if (roll < 0.55) return {
+        text: pick(JAPANESE),
+        fontFamily: "'Hiragino Sans', 'Yu Gothic', sans-serif",
+        size: Math.floor(rand(12, 18)),
+        color: '#cdd6f4',
+        maxOpacity: rand(0.07, 0.12),
+      };
+      if (roll < 0.80) return {
+        text: pick(NIX),
+        fontFamily: "'VT323', monospace",
+        size: Math.floor(rand(13, 19)),
+        color: '#89b4fa',
+        maxOpacity: rand(0.07, 0.11),
+      };
       return {
-        text,
-        font: `${size}px ${fontFamily}`,
-        color,
-        x: rand(20, canvas.width  - 20),
-        y: rand(20, canvas.height - 20),
-        vx: rand(-0.12, 0.12) * speedMult,
-        vy: rand(-0.12, 0.12) * speedMult,
-        phase: rand(0, Math.PI * 2),
-        maxOpacity,
-        opacity: 0,
-        fadeIn, hold, fadeOut,
-        age: 0,
-        typeSpeed: rand(1.0, 2.0),
-        flickerFrames: 0,
-        flickerTotal: 0,
+        text: pick(LAIN),
+        fontFamily: "'Share Tech Mono', monospace",
+        size: Math.floor(rand(11, 15)),
+        color: '#74c7ec',
+        maxOpacity: rand(0.10, 0.16),
       };
     }
 
-    const POOL = 50;
+    function pickLayer() {
+      const r = Math.random();
+      return r < 0.4 ? 0 : r < 0.8 ? 1 : 2;
+    }
+
+    function createParticle() {
+      const { speedMult, opacMult, sizeMult } = LAYERS[pickLayer()];
+      const content = contentConfig(Math.random());
+
+      const size       = Math.round(content.size * sizeMult);
+      const maxOpacity = Math.min(content.maxOpacity * opacMult, MAX_OPACITY);
+      const fadeIn     = Math.floor(rand(60, 120));
+      const hold       = Math.floor(rand(200, 500));
+      const fadeOut    = Math.floor(rand(60, 120));
+
+      return {
+        text:          content.text,
+        font:          `${size}px ${content.fontFamily}`,
+        color:         content.color,
+        x:             rand(20, canvas.width  - 20),
+        y:             rand(20, canvas.height - 20),
+        vx:            rand(-0.12, 0.12) * speedMult,
+        vy:            rand(-0.12, 0.12) * speedMult,
+        phase:         rand(0, Math.PI * 2),
+        maxOpacity,
+        fadeIn, hold, fadeOut,
+        total:         fadeIn + hold + fadeOut,
+        age:           0,
+        typeSpeed:     rand(1.0, 2.0),
+        flickerFrames: 0,
+        flickerTotal:  0,
+      };
+    }
+
+    function baseOpacity(p) {
+      if (p.age < p.fadeIn)          return (p.age / p.fadeIn) * p.maxOpacity;
+      if (p.age < p.fadeIn + p.hold) return p.maxOpacity;
+      return ((p.total - p.age) / p.fadeOut) * p.maxOpacity;
+    }
+
+    function applyFlicker(p, opacity) {
+      if (p.flickerFrames > 0) {
+        const t = 1 - (p.flickerFrames / p.flickerTotal);
+        p.flickerFrames--;
+        return opacity * (1 - FLICKER_DEPTH * Math.sin(t * Math.PI));
+      }
+      if (p.age > p.fadeIn + p.hold * FLICKER_START && Math.random() < FLICKER_PROB) {
+        p.flickerTotal  = Math.floor(rand(20, 45));
+        p.flickerFrames = p.flickerTotal;
+      }
+      return opacity;
+    }
+
     const particles = Array.from({ length: POOL }, createParticle);
     particles.forEach(p => { p.age = Math.floor(rand(0, p.fadeIn + p.hold)); });
 
     function tick() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        const total = p.fadeIn + p.hold + p.fadeOut;
-
-        if (p.age >= total) {
+      particles.forEach((p, i) => {
+        if (p.age >= p.total) {
           particles[i] = createParticle();
-          continue;
+          return;
         }
 
-        if (p.age < p.fadeIn) {
-          p.opacity = (p.age / p.fadeIn) * p.maxOpacity;
-        } else if (p.age < p.fadeIn + p.hold) {
-          p.opacity = p.maxOpacity;
-        } else {
-          p.opacity = ((total - p.age) / p.fadeOut) * p.maxOpacity;
-        }
+        const opacity = applyFlicker(p, baseOpacity(p));
 
-        if (p.flickerFrames > 0) {
-          const t = 1 - (p.flickerFrames / p.flickerTotal);
-          p.opacity *= 1 - (0.55 * Math.sin(t * Math.PI));
-          p.flickerFrames--;
-        } else if (p.age > p.fadeIn + p.hold * 0.65 && Math.random() < 0.004) {
-          p.flickerTotal  = Math.floor(rand(20, 45));
-          p.flickerFrames = p.flickerTotal;
-        }
+        p.x += p.vx + Math.sin(p.age * WAVE_FREQ + p.phase) * WAVE_AMP;
+        p.y += p.vy + Math.cos(p.age * WAVE_FREQ + p.phase) * WAVE_AMP;
 
-        p.x += p.vx + Math.sin(p.age * 0.02 + p.phase) * 0.1;
-        p.y += p.vy + Math.cos(p.age * 0.02 + p.phase) * 0.1;
-        if (p.x < -60)              p.x = canvas.width  + 60;
-        if (p.x > canvas.width  + 60) p.x = -60;
-        if (p.y < -30)              p.y = canvas.height + 30;
-        if (p.y > canvas.height + 30) p.y = -30;
+        if (p.x < -WRAP_X)               p.x = canvas.width  + WRAP_X;
+        if (p.x > canvas.width  + WRAP_X) p.x = -WRAP_X;
+        if (p.y < -WRAP_Y)               p.y = canvas.height + WRAP_Y;
+        if (p.y > canvas.height + WRAP_Y) p.y = -WRAP_Y;
 
         const typingProgress = Math.min(p.age / (p.fadeIn * p.typeSpeed), 1);
         const displayLength  = Math.ceil(typingProgress * p.text.length);
         const cursor         = displayLength < p.text.length ? '_' : '';
         const displayText    = p.text.slice(0, displayLength) + cursor;
 
-        ctx.save();
-        ctx.globalAlpha = p.opacity;
+        ctx.globalAlpha = opacity;
         ctx.fillStyle   = p.color;
         ctx.font        = p.font;
         ctx.fillText(displayText, p.x, p.y);
-        ctx.restore();
 
         p.age++;
-      }
+      });
 
       requestAnimationFrame(tick);
     }
