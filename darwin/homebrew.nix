@@ -12,6 +12,7 @@ _: {
       "google-chrome"
       "figma"
       "microsoft-teams"
+      "microsoft-word"
       "obsidian"
       "rekordbox"
       "slack"
