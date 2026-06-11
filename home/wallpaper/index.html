@@ -245,8 +245,8 @@
         color:         content.color,
         x:             spawnX,
         y:             spawnY,
-        vx:            rand(-0.12, 0.12) * speedMult,
-        vy:            rand(-0.12, 0.12) * speedMult,
+        vx:            rand(-0.08, 0.08) * speedMult,
+        vy:            rand(-0.08, 0.08) * speedMult,
         phase:         rand(0, Math.PI * 2),
         maxOpacity,
         fadeIn, hold, fadeOut,
@@ -264,13 +264,13 @@
       return ((p.total - p.age) / p.fadeOut) * p.maxOpacity;
     }
 
-    function applyFlicker(p, opacity) {
+    function applyFlicker(p, opacity, dt) {
       if (p.flickerFrames > 0) {
         const t = 1 - (p.flickerFrames / p.flickerTotal);
-        p.flickerFrames--;
+        p.flickerFrames -= dt;
         return opacity * (1 - FLICKER_DEPTH * Math.sin(t * Math.PI));
       }
-      if (p.age > p.fadeIn + p.hold * FLICKER_START && Math.random() < FLICKER_PROB) {
+      if (p.age > p.fadeIn + p.hold * FLICKER_START && Math.random() < FLICKER_PROB * dt) {
         p.flickerTotal  = Math.floor(rand(20, 45));
         p.flickerFrames = p.flickerTotal;
       }
@@ -280,23 +280,22 @@
     const particles = Array.from({ length: POOL }, createParticle);
     particles.forEach(p => { p.age = Math.floor(rand(0, p.fadeIn + p.hold)); });
 
-    function tickParticles() {
-
+    function tickParticles(dt) {
       particles.forEach((p, i) => {
         if (p.age >= p.total) {
           particles[i] = createParticle();
           return;
         }
 
-        const opacity = applyFlicker(p, baseOpacity(p));
+        const opacity = applyFlicker(p, baseOpacity(p), dt);
 
-        p.x += p.vx + Math.sin(p.age * WAVE_FREQ + p.phase) * WAVE_AMP;
-        p.y += p.vy + Math.cos(p.age * WAVE_FREQ + p.phase) * WAVE_AMP;
+        p.x += (p.vx + Math.sin(p.age * WAVE_FREQ + p.phase) * WAVE_AMP) * dt;
+        p.y += (p.vy + Math.cos(p.age * WAVE_FREQ + p.phase) * WAVE_AMP) * dt;
 
-        if (p.x < -WRAP_X)               p.x = canvas.width  + WRAP_X;
-        if (p.x > canvas.width  + WRAP_X) p.x = -WRAP_X;
-        if (p.y < -WRAP_Y)               p.y = canvas.height + WRAP_Y;
-        if (p.y > canvas.height + WRAP_Y) p.y = -WRAP_Y;
+        if (p.x < -WRAP_X)                p.x = canvas.width  + WRAP_X;
+        if (p.x > canvas.width  + WRAP_X)  p.x = -WRAP_X;
+        if (p.y < -WRAP_Y)                p.y = canvas.height + WRAP_Y;
+        if (p.y > canvas.height + WRAP_Y)  p.y = -WRAP_Y;
 
         const typingProgress = Math.min(p.age / (p.fadeIn * p.typeSpeed), 1);
         const displayLength  = Math.ceil(typingProgress * p.text.length);
@@ -307,30 +306,30 @@
         ctx.fillText(p.text.substring(0, displayLength), p.x, p.y);
         if (displayLength < p.text.length) ctx.fillText('_', p.x + ctx.measureText(p.text.substring(0, displayLength)).width, p.y);
 
-        p.age++;
+        p.age += dt;
       });
     }
 
     // --- λ boid swarm ---
     const BOID_COUNT    = 130;
-    const BOID_MAX_SPD  = 1.0;
-    const BOID_MIN_SPD  = 0.22;
+    const BOID_MAX_SPD  = 0.76;
+    const BOID_MIN_SPD  = 0.18;
     const BOID_LAYERS   = [
       { scaleMult: 0.65, opacity: 0.16 },  // background — genuinely distant
       { scaleMult: 1.0,  opacity: 0.40 },  // mid
       { scaleMult: 1.25, opacity: 0.72 },  // foreground — occlusive
     ];
     const CONTAIN_R     = 300;   // soft boundary radius — no spring inside, gentle pull outside
-    const CONTAIN_W     = 0.004;
+    const CONTAIN_W     = 0.002;
     const SEP_DIST      = 30;
     const SEP_DIST2     = SEP_DIST * SEP_DIST;
-    const SEP_WEIGHT    = 0.14;
+    const SEP_WEIGHT    = 0.07;
     const ALIGN_DIST2   = 85 * 85;
-    const ALIGN_WEIGHT  = 0.06;
+    const ALIGN_WEIGHT  = 0.03;
     const COH_DIST2     = 120 * 120;
-    const COH_WEIGHT    = 0.002;
-    const WANDER_WEIGHT = 0.08;
-    const WANDER_DRIFT  = 0.20;
+    const COH_WEIGHT    = 0.001;
+    const WANDER_WEIGHT = 0.06;
+    const WANDER_DRIFT  = 0.14;
 
     // pre-render λ once — drawImage is a GPU blit, fillText is software per call
     let lambdaBitmap = null;
@@ -384,7 +383,7 @@
 
     const boids = Array.from({ length: BOID_COUNT }, createBoid);
 
-    function tickBoids() {
+    function tickBoids(dt) {
       const cx = canvas.width  / 2;
       const cy = canvas.height / 2;
 
@@ -409,33 +408,33 @@
 
         if (sepN > 0) {
           const m = Math.hypot(sepX, sepY);
-          if (m > 0) { b.vx += sepX / m * SEP_WEIGHT; b.vy += sepY / m * SEP_WEIGHT; }
+          if (m > 0) { b.vx += sepX / m * SEP_WEIGHT * dt; b.vy += sepY / m * SEP_WEIGHT * dt; }
         }
         if (alignN > 0) {
           const m = Math.hypot(alignVX, alignVY);
-          if (m > 0) { b.vx += alignVX / m * ALIGN_WEIGHT; b.vy += alignVY / m * ALIGN_WEIGHT; }
+          if (m > 0) { b.vx += alignVX / m * ALIGN_WEIGHT * dt; b.vy += alignVY / m * ALIGN_WEIGHT * dt; }
         }
         if (cohN > 0) {
           const ddx = cohX / cohN - b.x, ddy = cohY / cohN - b.y;
           const m = Math.hypot(ddx, ddy);
-          if (m > 0) { b.vx += ddx / m * COH_WEIGHT; b.vy += ddy / m * COH_WEIGHT; }
+          if (m > 0) { b.vx += ddx / m * COH_WEIGHT * dt; b.vy += ddy / m * COH_WEIGHT * dt; }
         }
 
         // soft containment — free to roam inside CONTAIN_R, gently pulled back outside
         const rdx = b.x - cx, rdy = b.y - cy;
         const rdist = Math.hypot(rdx, rdy);
         if (rdist > CONTAIN_R) {
-          b.vx -= rdx / rdist * (rdist - CONTAIN_R) * CONTAIN_W;
-          b.vy -= rdy / rdist * (rdist - CONTAIN_R) * CONTAIN_W;
+          b.vx -= rdx / rdist * (rdist - CONTAIN_R) * CONTAIN_W * dt;
+          b.vy -= rdy / rdist * (rdist - CONTAIN_R) * CONTAIN_W * dt;
         }
 
-        b.wanderAngle += rand(-WANDER_DRIFT, WANDER_DRIFT);
-        b.vx += Math.cos(b.wanderAngle) * WANDER_WEIGHT;
-        b.vy += Math.sin(b.wanderAngle) * WANDER_WEIGHT;
+        b.wanderAngle += rand(-WANDER_DRIFT, WANDER_DRIFT) * dt;
+        b.vx += Math.cos(b.wanderAngle) * WANDER_WEIGHT * dt;
+        b.vy += Math.sin(b.wanderAngle) * WANDER_WEIGHT * dt;
 
         clampSpeed(b);
-        b.x += b.vx;
-        b.y += b.vy;
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
       });
 
       if (!lambdaBitmap) return;
@@ -451,13 +450,27 @@
       fgCtx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
-    function frame() {
-      requestAnimationFrame(frame);
+    let rafId = null;
+    let lastFrameTime = 0;
+
+    function frame(ts) {
+      rafId = requestAnimationFrame(frame);
+      const dt = Math.min((ts - lastFrameTime) / (1000 / 60), 3);
+      lastFrameTime = ts;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       fgCtx.clearRect(0, 0, fgCanvas.width, fgCanvas.height);
-      tickBoids();
-      tickParticles();
+      tickBoids(dt);
+      tickParticles(dt);
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      } else if (!rafId) {
+        requestAnimationFrame(frame);
+      }
+    });
 
     requestAnimationFrame(frame);
   </script>
