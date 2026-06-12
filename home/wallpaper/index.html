@@ -91,6 +91,7 @@
       width: 100%;
       height: 100%;
       animation: spin 25s linear infinite, glow-pulse 4s ease-in-out infinite;
+      will-change: filter, transform;
     }
 
     @keyframes spin {
@@ -157,27 +158,39 @@
     const fgCanvas = document.getElementById('ambient-fg');
     const fgCtx    = fgCanvas.getContext('2d', { desynchronized: true });
 
+    const WORLD = { w: 0, h: 0, cx: 0, cy: 0 };
+
     const resize = () => {
       canvas.width  = fgCanvas.width  = window.innerWidth;
       canvas.height = fgCanvas.height = window.innerHeight;
+      WORLD.w  = canvas.width;
+      WORLD.h  = canvas.height;
+      WORLD.cx = WORLD.w / 2;
+      WORLD.cy = WORLD.h / 2;
     };
     window.addEventListener('resize', resize);
     resize();
 
-    // content pools
+    // --- shared utilities ---
+    const rand         = (a, b) => a + Math.random() * (b - a);
+    const pick         = arr => arr[Math.floor(Math.random() * arr.length)];
+    const pickWeighted = thresholds => {
+      const r = Math.random();
+      const i = thresholds.findIndex(t => r < t);
+      return i === -1 ? thresholds.length : i;
+    };
+
+    // --- particles ---
     const NOISE    = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
     const JAPANESE = ['電脳','接続','記憶','存在','意識','現実','孤独','境界','信号','層','ネット','データ','エラー','システム','プロセス','メモリ','ホスト','カーネル'];
     const NIX      = ['flake.nix','wallpaper.nix','home-manager','nix-darwin','darwin/system.nix','mkDerivation','nixpkgs','home/zsh.nix','stdenv','buildInputs','home/git.nix','{ pkgs','...}:','inherit','lib.mkOption'];
     const LAIN     = ['LAYER:01','LAYER:02','LAYER:03','WIRED','THE WIRED','PROTOCOL 7','PRESENT DAY','PRESENT TIME','CLOSE THE WORLD','OPEN THE NEXT','TACHIBANA LABS','ACCELA','NAVI','DEUS','PSYCHE','RESET','DAEMON','REBOOT','BROADCAST','STATIC','OMNIPRESENT'];
 
-    // depth layer config [background, mid, foreground]
     const LAYERS = [
-      { speedMult: 0.38, opacMult: 0.32, sizeMult: 0.62 },  // background — distant, ghostly
+      { speedMult: 0.38, opacMult: 0.32, sizeMult: 0.62 },  // background
       { speedMult: 1.0,  opacMult: 0.85, sizeMult: 1.0  },  // mid
-      { speedMult: 1.75, opacMult: 1.42, sizeMult: 1.28 },  // foreground — close, prominent
+      { speedMult: 1.75, opacMult: 1.42, sizeMult: 1.28 },  // foreground
     ];
-
-    // tuning
     const POOL          = 70;
     const MAX_OPACITY   = 0.28;
     const WAVE_FREQ     = 0.02;
@@ -187,9 +200,6 @@
     const FLICKER_DEPTH = 0.55;
     const WRAP_X        = 60;
     const WRAP_Y        = 30;
-
-    const rand = (a, b) => a + Math.random() * (b - a);
-    const pick = arr  => arr[Math.floor(Math.random() * arr.length)];
 
     function contentConfig(roll) {
       if (roll < 0.25) return {
@@ -222,16 +232,11 @@
       };
     }
 
-    function pickLayer() {
-      const r = Math.random();
-      return r < 0.4 ? 0 : r < 0.8 ? 1 : 2;
-    }
-
     function createParticle() {
-      const { speedMult, opacMult, sizeMult } = LAYERS[pickLayer()];
+      const { speedMult, opacMult, sizeMult } = LAYERS[pickWeighted([0.4, 0.8])];
       const content = contentConfig(Math.random());
-      const spawnX = rand(20, canvas.width  - 20);
-      const spawnY = rand(20, canvas.height - 20);
+      const spawnX = rand(20, WORLD.w - 20);
+      const spawnY = rand(20, WORLD.h - 20);
 
       const size       = Math.round(content.size * sizeMult);
       const maxOpacity = Math.min(content.maxOpacity * opacMult, MAX_OPACITY);
@@ -280,37 +285,37 @@
     const particles = Array.from({ length: POOL }, createParticle);
     particles.forEach(p => { p.age = Math.floor(rand(0, p.fadeIn + p.hold)); });
 
-    function tickParticles(dt) {
+    function updateParticles(dt) {
       particles.forEach((p, i) => {
         if (p.age >= p.total) {
           particles[i] = createParticle();
           return;
         }
-
-        const opacity = applyFlicker(p, baseOpacity(p), dt);
-
+        p.currentOpacity = applyFlicker(p, baseOpacity(p), dt);
         p.x += (p.vx + Math.sin(p.age * WAVE_FREQ + p.phase) * WAVE_AMP) * dt;
         p.y += (p.vy + Math.cos(p.age * WAVE_FREQ + p.phase) * WAVE_AMP) * dt;
-
-        if (p.x < -WRAP_X)                p.x = canvas.width  + WRAP_X;
-        if (p.x > canvas.width  + WRAP_X)  p.x = -WRAP_X;
-        if (p.y < -WRAP_Y)                p.y = canvas.height + WRAP_Y;
-        if (p.y > canvas.height + WRAP_Y)  p.y = -WRAP_Y;
-
-        const typingProgress = Math.min(p.age / (p.fadeIn * p.typeSpeed), 1);
-        const displayLength  = Math.ceil(typingProgress * p.text.length);
-
-        ctx.globalAlpha = opacity;
-        ctx.fillStyle   = p.color;
-        ctx.font        = p.font;
-        ctx.fillText(p.text.substring(0, displayLength), p.x, p.y);
-        if (displayLength < p.text.length) ctx.fillText('_', p.x + ctx.measureText(p.text.substring(0, displayLength)).width, p.y);
-
+        if (p.x < -WRAP_X)          p.x = WORLD.w + WRAP_X;
+        if (p.x > WORLD.w + WRAP_X) p.x = -WRAP_X;
+        if (p.y < -WRAP_Y)          p.y = WORLD.h + WRAP_Y;
+        if (p.y > WORLD.h + WRAP_Y) p.y = -WRAP_Y;
         p.age += dt;
       });
     }
 
-    // --- λ boid swarm ---
+    function drawParticles() {
+      particles.forEach(p => {
+        if (p.age >= p.total) return;
+        const typingProgress = Math.min(p.age / (p.fadeIn * p.typeSpeed), 1);
+        const displayLength  = Math.ceil(typingProgress * p.text.length);
+        ctx.globalAlpha = p.currentOpacity;
+        ctx.fillStyle   = p.color;
+        ctx.font        = p.font;
+        ctx.fillText(p.text.substring(0, displayLength), p.x, p.y);
+        if (displayLength < p.text.length) ctx.fillText('_', p.x + ctx.measureText(p.text.substring(0, displayLength)).width, p.y);
+      });
+    }
+
+    // --- boids ---
     const BOID_COUNT    = 130;
     const BOID_MAX_SPD  = 0.76;
     const BOID_MIN_SPD  = 0.18;
@@ -332,7 +337,7 @@
     const WANDER_DRIFT  = 0.14;
 
     // pre-render λ once — drawImage is a GPU blit, fillText is software per call
-    let lambdaBitmap = null;
+    const sprite = { bitmap: null };
     const _lc = document.createElement('canvas');
     _lc.width = 36; _lc.height = 36;
     const _lctx = _lc.getContext('2d');
@@ -343,25 +348,19 @@
       _lctx.shadowColor  = '#89dceb';
       _lctx.fillStyle    = '#89dceb';
       _lctx.font         = "18px 'VT323', monospace";
-      // two draws: glow pass + sharp pass on top
       _lctx.fillText('λ', 18, 18);
       _lctx.fillText('λ', 18, 18);
-      lambdaBitmap = await createImageBitmap(_lc);
+      sprite.bitmap = await createImageBitmap(_lc);
     });
-
-    function pickBoidLayer() {
-      const r = Math.random();
-      return r < 0.35 ? 0 : r < 0.75 ? 1 : 2;
-    }
 
     function createBoid() {
       const angle    = rand(0, Math.PI * 2);
       const r        = rand(60, CONTAIN_R);
-      const cx       = canvas.width  / 2;
-      const cy       = canvas.height / 2;
+      const cx       = WORLD.cx;
+      const cy       = WORLD.cy;
       const velAngle = rand(0, Math.PI * 2);
       const spd      = rand(BOID_MIN_SPD, BOID_MAX_SPD);
-      const layerIdx = pickBoidLayer();
+      const layerIdx = pickWeighted([0.35, 0.75]);
       const bl       = BOID_LAYERS[layerIdx];
       return {
         x:           cx + Math.cos(angle) * r,
@@ -383,42 +382,39 @@
 
     const boids = Array.from({ length: BOID_COUNT }, createBoid);
 
-    function tickBoids(dt) {
-      const cx = canvas.width  / 2;
-      const cy = canvas.height / 2;
+    function accumulateNeighbors(b, i) {
+      return boids.reduce((acc, o, j) => {
+        if (i === j) return acc;
+        const dx = o.x - b.x, dy = o.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < SEP_DIST2 && d2 > 0) {
+          const d = Math.sqrt(d2);
+          const s = (SEP_DIST - d) / SEP_DIST;
+          acc.sepX -= dx / d * s; acc.sepY -= dy / d * s; acc.sepN++;
+        }
+        if (d2 < ALIGN_DIST2) { acc.alignVX += o.vx; acc.alignVY += o.vy; acc.alignN++; }
+        if (d2 < COH_DIST2)   { acc.cohX += o.x;     acc.cohY += o.y;     acc.cohN++; }
+        return acc;
+      }, { sepX: 0, sepY: 0, sepN: 0, alignVX: 0, alignVY: 0, alignN: 0, cohX: 0, cohY: 0, cohN: 0 });
+    }
+
+    const applyNorm = (b, dx, dy, weight, dt) => {
+      const m = Math.hypot(dx, dy);
+      if (m === 0) return;
+      b.vx += dx / m * weight * dt;
+      b.vy += dy / m * weight * dt;
+    };
+
+    function updateBoids(dt) {
+      const cx = WORLD.cx;
+      const cy = WORLD.cy;
 
       boids.forEach((b, i) => {
-        let sepX = 0, sepY = 0, sepN = 0;
-        let alignVX = 0, alignVY = 0, alignN = 0;
-        let cohX = 0, cohY = 0, cohN = 0;
+        const { sepX, sepY, sepN, alignVX, alignVY, alignN, cohX, cohY, cohN } = accumulateNeighbors(b, i);
 
-        boids.forEach((o, j) => {
-          if (i === j) return;
-          const dx = o.x - b.x, dy = o.y - b.y;
-          const d2 = dx * dx + dy * dy;
-
-          if (d2 < SEP_DIST2 && d2 > 0) {
-            const d = Math.sqrt(d2);
-            const s = (SEP_DIST - d) / SEP_DIST;
-            sepX -= dx / d * s; sepY -= dy / d * s; sepN++;
-          }
-          if (d2 < ALIGN_DIST2) { alignVX += o.vx; alignVY += o.vy; alignN++; }
-          if (d2 < COH_DIST2)   { cohX += o.x;     cohY += o.y;     cohN++; }
-        });
-
-        if (sepN > 0) {
-          const m = Math.hypot(sepX, sepY);
-          if (m > 0) { b.vx += sepX / m * SEP_WEIGHT * dt; b.vy += sepY / m * SEP_WEIGHT * dt; }
-        }
-        if (alignN > 0) {
-          const m = Math.hypot(alignVX, alignVY);
-          if (m > 0) { b.vx += alignVX / m * ALIGN_WEIGHT * dt; b.vy += alignVY / m * ALIGN_WEIGHT * dt; }
-        }
-        if (cohN > 0) {
-          const ddx = cohX / cohN - b.x, ddy = cohY / cohN - b.y;
-          const m = Math.hypot(ddx, ddy);
-          if (m > 0) { b.vx += ddx / m * COH_WEIGHT * dt; b.vy += ddy / m * COH_WEIGHT * dt; }
-        }
+        if (sepN > 0)   applyNorm(b, sepX, sepY, SEP_WEIGHT, dt);
+        if (alignN > 0) applyNorm(b, alignVX, alignVY, ALIGN_WEIGHT, dt);
+        if (cohN > 0)   applyNorm(b, cohX / cohN - b.x, cohY / cohN - b.y, COH_WEIGHT, dt);
 
         // soft containment — free to roam inside CONTAIN_R, gently pulled back outside
         const rdx = b.x - cx, rdy = b.y - cy;
@@ -436,40 +432,44 @@
         b.x += b.vx * dt;
         b.y += b.vy * dt;
       });
+    }
 
-      if (!lambdaBitmap) return;
+    function drawBoids() {
+      if (!sprite.bitmap) return;
       boids.forEach(b => {
         const target = b.layer === 2 ? fgCtx : ctx;
         target.globalAlpha = b.opacity;
         const angle = Math.atan2(b.vy, b.vx) + Math.PI / 2;
         const cs = Math.cos(angle) * b.scale, sn = Math.sin(angle) * b.scale;
         target.setTransform(cs, sn, -sn, cs, b.x, b.y);
-        target.drawImage(lambdaBitmap, -18, -18);
+        target.drawImage(sprite.bitmap, -18, -18);
       });
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       fgCtx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
-    let rafId = null;
-    let lastFrameTime = 0;
+    // --- loop ---
+    const loop = { rafId: null, lastFrameTime: 0 };
 
     function frame(ts) {
-      rafId = requestAnimationFrame(frame);
-      const dt = Math.min((ts - lastFrameTime) / (1000 / 60), 3);
-      lastFrameTime = ts;
+      loop.rafId = requestAnimationFrame(frame);
+      const dt = Math.min((ts - loop.lastFrameTime) / (1000 / 60), 3);
+      loop.lastFrameTime = ts;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       fgCtx.clearRect(0, 0, fgCanvas.width, fgCanvas.height);
-      tickBoids(dt);
-      tickParticles(dt);
+      updateBoids(dt);
+      drawBoids();
+      updateParticles(dt);
+      drawParticles();
     }
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      } else if (!rafId) {
-        requestAnimationFrame(frame);
+        cancelAnimationFrame(loop.rafId);
+        loop.rafId = null;
+        return;
       }
+      if (!loop.rafId) requestAnimationFrame(frame);
     });
 
     requestAnimationFrame(frame);
