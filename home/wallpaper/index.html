@@ -126,6 +126,143 @@
           drop-shadow(0 0 75px rgba(82, 119, 195, 0.5));
       }
     }
+    /* navi — header of the system status panel */
+    #panel-navi-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'PPMondwest', monospace;
+      font-size: 32px;
+      line-height: 1;
+      color: #cdd6f4;
+      opacity: 0.72;
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 20px rgba(137, 180, 250, 0.22);
+      margin-bottom: 8px;
+    }
+
+    /* NixOS — bottom-right corner, large display font mirrors the stats panel on the left */
+    #logo-nixos {
+      position: fixed;
+      bottom: 52px;
+      right: 32px;
+      text-align: right;
+      pointer-events: none;
+      z-index: 8;
+      user-select: none;
+    }
+
+    #logo-nixos-name {
+      display: block;
+      font-family: 'PPMondwest', monospace;
+      font-size: 62px;
+      line-height: 1;
+      color: #cdd6f4;
+      opacity: 0.45;
+      letter-spacing: 0.02em;
+    }
+
+    #logo-nixos-arch {
+      display: block;
+      font-family: 'PPNeueBit', monospace;
+      font-size: 18px;
+      color: #cdd6f4;
+      opacity: 0.42;
+      letter-spacing: 0.14em;
+      margin-top: 6px;
+    }
+
+    /* sys panel */
+    #panel-sys {
+      position: fixed;
+      bottom: 52px;
+      left: 32px;
+      border-left: 2px solid rgba(137, 180, 250, 0.22);
+      padding: 14px 18px 14px 12px;
+      background: rgba(30, 30, 46, 0.42);
+      border-radius: 3px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 8;
+      user-select: none;
+    }
+
+    .sys-row {
+      display: flex;
+      gap: 14px;
+      font-family: 'PPNeueBit', monospace;
+      font-size: 14px;
+      line-height: 2.3;
+    }
+
+    .sys-label {
+      color: #a6adc8;
+      letter-spacing: 0.10em;
+      width: 42px;
+    }
+
+    .sys-val {
+      color: #cdd6f4;
+      letter-spacing: 0.05em;
+    }
+
+    .sys-sep {
+      height: 1px;
+      background: #45475a;
+      margin: 4px 0;
+      opacity: 0.55;
+    }
+
+    #panel-navi-header::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #a6e3a1;
+      box-shadow: 0 0 6px rgba(166, 227, 161, 0.8);
+      animation: pulse-dot 2.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50%       { opacity: 0.35; transform: scale(0.65); }
+    }
+
+    #sys-frame::after {
+      content: '_';
+      animation: blink-cursor 1.1s step-end infinite;
+      color: #89b4fa;
+      margin-left: 2px;
+    }
+
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    #panel-sys::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -30px;
+      height: 30px;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(137, 180, 250, 0.05),
+        transparent
+      );
+      animation: scan-sweep 5s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan-sweep {
+      0%   { top: -30px; }
+      100% { top: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -164,6 +301,20 @@
         <use href="#lam-b" transform="rotate(-120,407.28823,-715.86995)"/>
       </g>
     </svg>
+  </div>
+
+  <div id="logo-nixos">
+    <span id="logo-nixos-name">nix-darwin</span>
+    <span id="logo-nixos-arch">aarch64-darwin</span>
+  </div>
+
+  <div id="panel-sys">
+    <div id="panel-navi-header">navi</div>
+    <div class="sys-sep"></div>
+    <div class="sys-row"><span class="sys-label">CORE</span><span class="sys-val" id="sys-cores">—</span></div>
+    <div class="sys-row"><span class="sys-label">UP</span><span class="sys-val" id="sys-up">—</span></div>
+    <div class="sys-row"><span class="sys-label">FPS</span><span class="sys-val" id="sys-fps">—</span></div>
+    <div class="sys-row"><span class="sys-label">FRME</span><span class="sys-val" id="sys-frame">—</span></div>
   </div>
 
   <script>
@@ -462,12 +613,45 @@
       fgCtx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
+    // --- panels ---
+    const PANELS_BOOT = performance.now();
+    const perf = { fps: 0, frameMs: 0, _samples: [] };
+
+    function fmtUptime(ms) {
+      const s  = Math.floor(ms / 1000);
+      const h  = Math.floor(s / 3600).toString().padStart(2, '0');
+      const m  = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+      const sc = (s % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${sc}`;
+    }
+
+    function updatePanels() {
+      document.getElementById('sys-cores').textContent = navigator.hardwareConcurrency || '—';
+      document.getElementById('sys-up').textContent    = fmtUptime(performance.now() - PANELS_BOOT);
+      const fpsEl = document.getElementById('sys-fps');
+      const fps   = perf.fps;
+      fpsEl.textContent = fps || '—';
+      fpsEl.style.color = fps >= 90 ? '#94e2d5' : fps >= 50 ? '#cdd6f4' : fps > 0 ? '#f9e2af' : '#cdd6f4';
+      document.getElementById('sys-frame').textContent = perf.fps ? perf.frameMs + 'ms' : '—';
+    }
+
+    setInterval(updatePanels, 1000);
+    updatePanels();
+
     // --- loop ---
     const loop = { rafId: null, lastFrameTime: 0 };
 
     function frame(ts) {
       loop.rafId = requestAnimationFrame(frame);
-      const dt = Math.min((ts - loop.lastFrameTime) / (1000 / 60), 3);
+      const rawMs = ts - loop.lastFrameTime;
+      const dt    = Math.min(rawMs / (1000 / 60), 3);
+      if (loop.lastFrameTime > 0) {
+        perf._samples.push(rawMs);
+        if (perf._samples.length > 60) perf._samples.shift();
+        const avg    = perf._samples.reduce((a, b) => a + b) / perf._samples.length;
+        perf.fps     = Math.round(1000 / avg);
+        perf.frameMs = avg.toFixed(1);
+      }
       loop.lastFrameTime = ts;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       fgCtx.clearRect(0, 0, fgCanvas.width, fgCanvas.height);
