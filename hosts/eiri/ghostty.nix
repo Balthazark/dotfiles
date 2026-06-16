@@ -5,8 +5,8 @@
     package = pkgs.ghostty;
     settings = {
       theme = "Catppuccin Mocha";
-      font-family = "JetBrainsMono Nerd Font Mono";
       font-size = 14;
+      progress-style = false;
       mouse-hide-while-typing = true;
       window-padding-x = 10;
       window-padding-y = 10;
