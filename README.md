@@ -39,5 +39,3 @@ The wallpaper content lives in `hosts/navi/wallpaper/` in this repo and is loade
 6. Set a password for the `kagu` user: `sudo passwd kagu`
 7. Optionally make NixOS the default WSL distro: `wsl -s NixOS` (run from PowerShell)
 8. Re-open the shell — you'll now be logged in as `kagu` and `rb` works as normal
-
-Note: skip `nix-channel --update` — not needed since this config uses flakes.
