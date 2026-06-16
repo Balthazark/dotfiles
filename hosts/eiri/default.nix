@@ -17,6 +17,8 @@
 
   programs.zsh.enable = true;
 
+  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+
   users.users.kagu = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];

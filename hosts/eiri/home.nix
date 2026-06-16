@@ -1,6 +1,7 @@
 _: {
   imports = [
     ../../modules/common
+    ./wezterm.nix
   ];
 
   home = {
