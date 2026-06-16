@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   imports = [
     ../../modules/common
+    ./fonts.nix
     ./windowsterminal.nix
   ];
 

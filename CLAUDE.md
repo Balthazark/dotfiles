@@ -89,7 +89,7 @@ Conventional commits with scopes. Common scopes:
 | `chore(flake):` | `flake.nix`, `flake.lock` |
 | `ci:` | `.github/workflows/` |
 
-`ci:` never needs a scope. `chore:` without a scope is fine when a change spans multiple modules. Commit body bullets: lowercase, imperative mood.
+`ci:` never needs a scope. `chore:` without a scope is fine when a change spans multiple modules. Commit body bullets: lowercase, imperative mood, max 100 chars per line — use more bullets rather than wrapping a single one.
 
 ## Adding new things
 
