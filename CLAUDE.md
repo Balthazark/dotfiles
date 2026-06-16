@@ -4,49 +4,67 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-nix-darwin + home-manager configuration for a single machine (`navi`, aarch64-darwin). One flake, nixpkgs-unstable. Homebrew is used for all GUI apps (casks), regardless of whether a Nix package exists, to get faster upstream updates.
+Multi-host nix-darwin + NixOS + home-manager configuration. One flake, nixpkgs-unstable. Homebrew is used for all GUI apps (casks) on darwin, regardless of whether a Nix package exists, to get faster upstream updates.
+
+| Host | System | Description |
+|---|---|---|
+| `navi` | aarch64-darwin | personal macOS machine |
+| `eiri` | x86_64-linux | NixOS on WSL2 |
 
 ## Commands
 
 ```bash
-drb                          # apply config (alias for sudo darwin-rebuild switch --flake ~/git/dotfiles#navi)
+rb                           # apply config — smart alias, detects OS and hostname automatically
 nix fmt                      # format all nix files (nixfmt-tree)
 statix check ~/git/dotfiles  # lint for antipatterns
 deadnix ~/git/dotfiles       # find unused bindings
-sudo darwin-rebuild check --flake ~/git/dotfiles#navi  # dry-run without applying
+# dry-run without applying:
+sudo darwin-rebuild check --flake ~/git/dotfiles#navi       # on navi
+sudo nixos-rebuild dry-activate --flake ~/git/dotfiles#eiri # on eiri
 ```
 
-Always run `nix fmt`, `statix check`, and `deadnix` after editing any `.nix` file (the PostToolUse hook does this automatically). Run `drb` to verify the config builds and activates before considering a task done.
+Always run `nix fmt`, `statix check`, and `deadnix` after editing any `.nix` file (the PostToolUse hook does this automatically). Run `rb` to verify the config builds and activates before considering a task done.
 
 ## Module structure
 
 ```
-flake.nix              # single entry point, declares nixpkgs-unstable + nix-darwin + home-manager
-darwin/
-  default.nix          # imports the darwin modules below
-  system.nix           # hostname, primaryUser, stateVersion, experimental-features, unfree allowlist
-  security.nix         # Touch ID sudo
-  homebrew.nix         # all GUI casks; cleanup = "zap" means unlisted casks are removed on rebuild
-  macos.nix            # system.defaults — dock, finder, trackpad, keyboard, screenshots
-home/
-  default.nix          # imports the home modules below
-  packages.nix         # home.packages — user CLI tools
-  git.nix              # programs.git
-  zsh.nix              # programs.zsh, fzf, zoxide — shell config, vi mode, aliases
-  ssh.nix              # programs.ssh — ~/.ssh/config with macOS Keychain integration
-  bat.nix              # programs.bat — catppuccin-mocha theme
-  starship.nix         # programs.starship — prompt with catppuccin-mocha palette
+flake.nix                    # declares nixpkgs-unstable, nix-darwin, home-manager, nixos-wsl
+hosts/
+  navi/
+    default.nix              # darwin system config, imports modules/darwin/
+    home.nix                 # navi-specific home assembly, imports modules/common/
+  eiri/
+    default.nix              # NixOS system config, imports modules/nixos/
+    home.nix                 # eiri-specific home assembly, imports modules/common/
+modules/
+  common/
+    default.nix              # imports the common home-manager modules below
+    packages.nix             # shared CLI tools
+    git.nix                  # programs.git
+    zsh.nix                  # programs.zsh, fzf, zoxide — shell config, vi mode, aliases (includes rb)
+    ssh.nix                  # programs.ssh — ~/.ssh/config
+    bat.nix                  # programs.bat — catppuccin-mocha theme
+    starship.nix             # programs.starship — prompt with catppuccin-mocha palette
+  darwin/
+    default.nix              # imports the darwin modules below
+    system.nix               # hostname, primaryUser, stateVersion, experimental-features, unfree allowlist
+    security.nix             # Touch ID sudo
+    homebrew.nix             # all GUI casks; cleanup = "zap" means unlisted casks are removed on rebuild
+    macos.nix                # system.defaults — dock, finder, trackpad, keyboard, screenshots
+  nixos/
+    default.nix              # imports the nixos modules below
+    wsl.nix                  # NixOS-WSL integration
 ```
 
-darwin modules are nix-darwin modules; home modules are home-manager modules. The two systems are composed in `flake.nix` via `home-manager.darwinModules.home-manager`.
+darwin modules are nix-darwin modules; nixos modules are NixOS modules; common modules are home-manager modules. All hosts wire home-manager in via the respective `*Modules.home-manager` integration point in `flake.nix`.
 
 ## Conventions
 
-**Adding packages:** CLI tools go in `home/packages.nix`. GUI apps go in `darwin/homebrew.nix` as casks. Programs with configuration (git, zsh, ssh) get their own module in `home/`.
+**Adding packages:** Shared CLI tools go in `modules/common/packages.nix`. GUI apps go in `modules/darwin/homebrew.nix` as casks. Host-specific tools go in the relevant `hosts/<name>/home.nix`. Programs with configuration (git, zsh, ssh) get their own module in `modules/common/`.
 
 **New modules:** create the file, add it to the relevant `default.nix` imports list. Use `_:` for modules that don't destructure arguments; use `{ pkgs, ... }:` only when `pkgs` is needed.
 
-**Unfree packages:** add the package name to the allowlist in `darwin/system.nix`.
+**Unfree packages:** add the package name to the allowlist in `modules/darwin/system.nix`.
 
 **Nix style:**
 - `_:` not `{ ... }:` for modules with no used arguments
@@ -59,11 +77,14 @@ Conventional commits with scopes. Common scopes:
 
 | Scope | Where |
 |---|---|
-| `chore(system):` | `darwin/system.nix`, `darwin/security.nix` |
-| `chore(macos):` | `darwin/macos.nix` |
-| `chore(homebrew):` | `darwin/homebrew.nix` |
-| `feat(darwin):` / `fix(darwin):` | new darwin services (e.g. yabai, skhd) |
-| `feat(home):` / `fix(home):` | anything in `home/` |
+| `chore(system):` | `modules/darwin/system.nix`, `modules/darwin/security.nix` |
+| `chore(macos):` | `modules/darwin/macos.nix` |
+| `chore(homebrew):` | `modules/darwin/homebrew.nix` |
+| `feat(darwin):` / `fix(darwin):` | new darwin modules |
+| `feat(nixos):` / `fix(nixos):` | new nixos modules |
+| `chore(nixos):` | routine NixOS system config (wsl.nix, system options) |
+| `feat(home):` / `fix(home):` | `modules/common/` or `hosts/*/home.nix` |
+| `chore(hosts):` | `hosts/` structure, per-host config |
 | `chore(flake):` | `flake.nix`, `flake.lock` |
 | `ci:` | `.github/workflows/` |
 

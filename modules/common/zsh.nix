@@ -21,7 +21,6 @@
       };
 
       shellAliases = {
-        drb = "sudo darwin-rebuild switch --flake ~/git/dotfiles#navi";
         ls = "eza --icons=always";
         ll = "eza --icons=always -l";
         la = "eza --icons=always -la";
@@ -52,6 +51,14 @@
         zstyle ':completion:*' menu no
         zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --icons=always --color=always $realpath'
         zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --icons=always --color=always $realpath'
+
+        rb() {
+          if [[ "$(uname)" == "Darwin" ]]; then
+            sudo darwin-rebuild switch --flake ~/git/dotfiles#$(hostname -s)
+          else
+            sudo nixos-rebuild switch --flake ~/git/dotfiles#$(hostname -s)
+          fi
+        }
 
         ta() { echo "- [ ] $*" >> ~/git/notes/TODO.md }
       '';

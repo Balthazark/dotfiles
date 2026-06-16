@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
 
 concurrency:
   group: ${{ github.ref }}
@@ -27,15 +28,24 @@ jobs:
         run: nix run nixpkgs#deadnix -- --fail .
 
   build:
-    name: Build
-    runs-on: macos-latest
+    name: Build ${{ matrix.host }}
+    strategy:
+      matrix:
+        include:
+          - host: navi
+            runs-on: macos-latest
+            cmd: nix build .#darwinConfigurations.navi.system
+          - host: eiri
+            runs-on: ubuntu-latest
+            cmd: nix build .#nixosConfigurations.eiri.config.system.build.toplevel
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@v22
       - uses: DeterminateSystems/magic-nix-cache-action@v8
 
-      - name: Build navi
-        run: nix build .#darwinConfigurations.navi.system
+      - name: Build ${{ matrix.host }}
+        run: ${{ matrix.cmd }}
 
   commitlint:
     name: Conventional commits

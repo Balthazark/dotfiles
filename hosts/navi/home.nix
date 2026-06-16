@@ -1,13 +1,9 @@
 { lib, ... }:
 {
   imports = [
-    ./packages.nix
-    ./git.nix
+    ../../modules/common
     ./ssh.nix
-    ./zsh.nix
-    ./bat.nix
     ./ghostty.nix
-    ./starship.nix
     ./wallpaper.nix
   ];
 
