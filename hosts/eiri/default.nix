@@ -26,11 +26,6 @@
     export XDG_DATA_DIRS="/etc/profiles/per-user/kagu/share:$XDG_DATA_DIRS"
   '';
 
-  systemd.tmpfiles.rules = [
-    "d /usr/share/applications 0755 root root -"
-    "L+ /usr/share/applications/com.mitchellh.ghostty.desktop - - - - ${pkgs.ghostty}/share/applications/com.mitchellh.ghostty.desktop"
-  ];
-
   fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
   users.users.kagu = {

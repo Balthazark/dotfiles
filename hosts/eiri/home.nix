@@ -1,7 +1,7 @@
 { pkgs, ... }: {
   imports = [
     ../../modules/common
-    ./ghostty.nix
+    ./windowsterminal.nix
   ];
 
   home = {
