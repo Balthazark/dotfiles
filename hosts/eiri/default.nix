@@ -17,6 +17,10 @@
 
   programs.zsh.enable = true;
 
+  environment.extraInit = ''
+    export XDG_DATA_DIRS="/etc/profiles/per-user/kagu/share:$XDG_DATA_DIRS"
+  '';
+
   fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
   users.users.kagu = {
