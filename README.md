@@ -32,8 +32,8 @@ The wallpaper content lives in `hosts/navi/wallpaper/` in this repo and is loade
 ### eiri — NixOS on WSL2
 
 1. Install WSL2 on the Windows machine
-2. Download the NixOS-WSL installer tarball from the [NixOS-WSL releases](https://github.com/nix-community/NixOS-WSL/releases)
-3. `wsl --import NixOS $env:USERPROFILE\NixOS nixos-wsl.tar.gz`
-4. Launch NixOS, clone this repo to `~/git/dotfiles`
+2. Download `nixos.wsl` from the [NixOS-WSL releases](https://github.com/nix-community/NixOS-WSL/releases)
+3. `wsl --install --from-file nixos.wsl`
+4. Launch NixOS (`wsl -d NixOS`), clone this repo to `~/git/dotfiles`
 5. `sudo nixos-rebuild switch --flake ~/git/dotfiles#eiri`
 6. After that, `rb` works as normal
