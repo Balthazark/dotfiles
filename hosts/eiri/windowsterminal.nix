@@ -55,7 +55,7 @@ let
         colorScheme = "Catppuccin Mocha";
         font = {
           face = "JetBrainsMono Nerd Font Mono";
-          size = 14;
+          size = 11;
         };
       };
       list = [
