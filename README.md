@@ -35,5 +35,9 @@ The wallpaper content lives in `hosts/navi/wallpaper/` in this repo and is loade
 2. Download `nixos.wsl` from the [NixOS-WSL releases](https://github.com/nix-community/NixOS-WSL/releases)
 3. `wsl --install --from-file nixos.wsl`
 4. Launch NixOS (`wsl -d NixOS`), clone this repo to `~/git/dotfiles`
-5. `sudo nixos-rebuild switch --flake ~/git/dotfiles#eiri`
-6. After that, `rb` works as normal
+5. `sudo nixos-rebuild switch --flake ~/git/dotfiles#eiri` (run as the default `nixos` user)
+6. Set a password for the `kagu` user: `sudo passwd kagu`
+7. Optionally make NixOS the default WSL distro: `wsl -s NixOS` (run from PowerShell)
+8. Re-open the shell — you'll now be logged in as `kagu` and `rb` works as normal
+
+Note: skip `nix-channel --update` — not needed since this config uses flakes.
