@@ -1,7 +1,7 @@
 _: {
   imports = [
     ../../modules/common
-    ./wezterm.nix
+    ./ghostty.nix
   ];
 
   home = {
