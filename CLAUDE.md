@@ -84,6 +84,7 @@ Conventional commits with scopes. Common scopes:
 | `feat(nixos):` / `fix(nixos):` | new nixos modules |
 | `chore(nixos):` | routine NixOS system config (wsl.nix, system options) |
 | `feat(home):` / `fix(home):` | `modules/common/` or `hosts/*/home.nix` |
+| `feat(hosts):` / `fix(hosts):` | new per-host features (e.g. WezTerm, host-specific tools) |
 | `chore(hosts):` | `hosts/` structure, per-host config |
 | `chore(flake):` | `flake.nix`, `flake.lock` |
 | `ci:` | `.github/workflows/` |
