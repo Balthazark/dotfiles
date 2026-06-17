@@ -9,6 +9,9 @@
     stateVersion = "25.05";
     username = "kagu";
     homeDirectory = "/home/kagu";
-    packages = [ pkgs.github-copilot-cli ];
+    packages = [
+      pkgs.github-copilot-cli
+      pkgs.uv
+    ];
   };
 }
