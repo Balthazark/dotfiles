@@ -1,5 +1,6 @@
 { lib, pkgs, ... }:
 let
+  esc = builtins.fromJSON ''"\u001b"'';
   catppuccinMocha = {
     name = "Catppuccin Mocha";
     background = "#1E1E2E";
@@ -43,6 +44,13 @@ let
       {
         id = "Terminal.FindText";
         keys = "ctrl+shift+f";
+      }
+      {
+        command = {
+          action = "sendInput";
+          input = "${esc}[13;2u";
+        };
+        keys = "shift+enter";
       }
       {
         id = "Terminal.DuplicatePaneAuto";
