@@ -86,6 +86,8 @@ Conventional commits with scopes. Common scopes:
 | `feat(home):` / `fix(home):` | `modules/common/` or `hosts/*/home.nix` |
 | `feat(hosts):` / `fix(hosts):` | new per-host features (e.g. WezTerm, host-specific tools) |
 | `chore(hosts):` | `hosts/` structure, per-host config |
+| `feat(eiri):` / `fix(eiri):` | eiri-specific changes in `hosts/eiri/` |
+| `feat(navi):` / `fix(navi):` | navi-specific changes in `hosts/navi/` |
 | `chore(flake):` | `flake.nix`, `flake.lock` |
 | `ci:` | `.github/workflows/` |
 

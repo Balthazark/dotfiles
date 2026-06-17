@@ -14,6 +14,7 @@
     packages = [
       pkgs.github-copilot-cli
       pkgs.uv
+      pkgs.python311
     ];
   };
 }
