@@ -5,5 +5,6 @@ _: {
     ./zsh.nix
     ./bat.nix
     ./starship.nix
+    ./direnv.nix
   ];
 }
