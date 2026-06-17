@@ -5,6 +5,8 @@
     ./windowsterminal.nix
   ];
 
+  programs.git.settings.credential.helper = "store";
+
   home = {
     stateVersion = "25.05";
     username = "kagu";
