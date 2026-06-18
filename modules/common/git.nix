@@ -6,6 +6,14 @@
 
   programs.git = {
     enable = true;
+    ignores = [
+      # nix dev shell artefacts — local tooling, not for repos
+      "flake.nix"
+      "flake.lock"
+      ".envrc"
+      ".direnv/"
+    ];
+
     settings = {
       user = {
         name = "Karl Gunnarsson";
