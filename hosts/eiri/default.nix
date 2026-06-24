@@ -28,9 +28,14 @@
 
   fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
+  virtualisation.docker.enable = true;
+
   users.users.kagu = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    extraGroups = [
+      "wheel"
+      "docker"
+    ];
     shell = pkgs.zsh;
   };
 }
