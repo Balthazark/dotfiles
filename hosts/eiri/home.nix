@@ -8,6 +8,11 @@
   programs = {
     git.settings.credential.helper = "store";
 
+    # The company gateway URL is internal, so it lives in a local file instead of this repo.
+    zsh.initContent = ''
+      [[ -r ${config.xdg.configHome}/anthropic/base-url ]] && export ANTHROPIC_BASE_URL="$(<${config.xdg.configHome}/anthropic/base-url)"
+    '';
+
     claude-code = {
       enable = true;
       # modules/common/packages.nix already installs pkgs.claude-code.
