@@ -4,6 +4,7 @@
     pkgs.claude-code
     pkgs.eza
     pkgs.gh
+    pkgs.herdr
     pkgs.statix
     pkgs.deadnix
     pkgs.nixd
